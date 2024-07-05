@@ -1,10 +1,12 @@
 # PGPBox (Python)
-A user-friendly PGP Web GUI for generating, storing, encrypting, and decrypting PGP messages. Secure your communications effortlessly with this intuitive web-based application.
+A user-friendly PGP Web GUI for generating, storing, encrypting, decrypting, signing and verifying PGP messages. Secure your communications effortlessly with this intuitive web-based application.
 
 ## Features
 - Generate PGP keys
 - Encrypt messages with PGP
 - Decrypt PGP encrypted messages
+- Sign messages with PGP
+- Verify PGP signed messages 
 
 ## Setup
 Follow these steps to set up the project:
