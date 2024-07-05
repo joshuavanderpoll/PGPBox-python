@@ -233,3 +233,18 @@ def verify_message():
             return jsonify({'message': 'Signature is invalid'}), 400
     except PGPy.errors.PGPError:
         return jsonify({'message': 'Signature is invalid'}), 400
+    
+
+@app.route('/api/delete-key', methods=['POST'])
+def delete_key():
+    data = request.json
+    keyId = int(data.get('id'))
+
+    key = Key.query.filter_by(id=keyId).first()
+    if not key:
+        return jsonify({'message': 'Key not found'}), 404
+
+    db.session.delete(key)
+    db.session.commit()
+
+    return jsonify({'message': 'Key deleted successfully!'})

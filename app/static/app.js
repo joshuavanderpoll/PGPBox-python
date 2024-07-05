@@ -64,6 +64,7 @@ function refreshKeyList() {
                 <td class="border px-4 py-2">
                     <button class="copyPublicKeyButton bg-blue-500 text-white px-2 py-1 rounded" data-key="${key.publicKey}">Copy Public</button>
                     ${copyPrivateKey}
+                    <button class="deleteKeyButton bg-red-500 text-white px-2 py-1 rounded" data-id="${key.id}">Delete</button>
                 </td>
             </tr>`;
             keysList.innerHTML += row;
@@ -126,6 +127,22 @@ function copyKey(key, isPrivate) {
     });
 }
 
+// Function to delete a key
+function deleteKey(id) {
+    fetch('/api/delete-key', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id })
+    })
+    .then(response => response.json())
+    .then(data => {
+        refreshKeyList();
+        alert(data.message);
+    });
+}
+
 // Function to attach event listeners to copy buttons
 function attachCopyEventListeners() {
     document.querySelectorAll('.copyPublicKeyButton').forEach(button => {
@@ -137,6 +154,14 @@ function attachCopyEventListeners() {
     document.querySelectorAll('.copyPrivateKeyButton').forEach(button => {
         button.addEventListener('click', function() {
             confirmCopyPrivateKey(this.dataset.key);
+        });
+    });
+
+    document.querySelectorAll('.deleteKeyButton').forEach(button => {
+        button.addEventListener('click', function() {
+            if (confirm("Are you sure you want to delete this key?")) {
+                deleteKey(this.dataset.id);
+            }
         });
     });
 }
