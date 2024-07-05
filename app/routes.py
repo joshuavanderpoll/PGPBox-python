@@ -26,7 +26,7 @@ def generate_keys():
 
     # Generate PGP keys
     key = PGPy.PGPKey.new(PGPy.constants.PubKeyAlgorithm.RSAEncryptOrSign, key_size)
-    uid = PGPy.PGPUID.new('', comment=comment, email=email)
+    uid = PGPy.PGPUID.new(comment, comment=comment, email=email)
 
     key.add_uid(uid, usage={PGPy.constants.KeyFlags.Sign, PGPy.constants.KeyFlags.EncryptCommunications},
         hashes=[PGPy.constants.HashAlgorithm.SHA512],
@@ -118,13 +118,16 @@ def view_keys():
             public_key.parse(key.public_key)
 
             if public_key.is_public:
-                uid = public_key.userids[0]
-                key_info['id'] = key.id
-                key_info['email'] = uid.email
-                key_info['notes'] = uid.comment
-                key_info['fingerprint'] = public_key.fingerprint
-                key_info['expirationDate'] = str(public_key.expires_at) if public_key.expires_at else 'Never'
-                keys_list.append(key_info)
+                try:
+                    uid = public_key.userids[0]
+                    key_info['id'] = key.id
+                    key_info['email'] = uid.email
+                    key_info['notes'] = uid.comment
+                    key_info['fingerprint'] = public_key.fingerprint
+                    key_info['expirationDate'] = str(public_key.expires_at) if public_key.expires_at else 'Never'
+                    keys_list.append(key_info)
+                except IndexError:
+                    continue
         except (PGPy.errors.PGPError, ValueError):
             continue
 
@@ -136,6 +139,9 @@ def view_keys():
 def encrypt_message():
     data = request.json
 
+    if not data.get('message') or not data.get('key'):
+        return jsonify({'message': 'Missing required fields'}), 400
+
     message = str(data.get('message'))
     keyId = int(data.get('key'))
     
@@ -145,7 +151,7 @@ def encrypt_message():
     
     public_key = PGPy.PGPKey()
     public_key.parse(key.public_key)
-    pgp_message = public_key.encrypt(PGPy.PGPMessage.new(message, cleartext=True))
+    pgp_message = public_key.encrypt(PGPy.PGPMessage.new(message))
 
     return jsonify({'output': str(pgp_message)})
 
@@ -154,21 +160,33 @@ def encrypt_message():
 def decrypt_message():
     data = request.json
 
+    if not data.get('message') or not data.get('privateKey'):
+        return jsonify({'message': 'Missing required fields'}), 400
+
     message = str(data.get('message'))
     keyId = int(data.get('privateKey'))
-    password = str(data.get('password'))
+    password = str(data.get('password')) if data.get('password') else None
 
     key = Key.query.filter_by(id=keyId).first()
     if not key:
         return jsonify({'message': 'Private key not found'}), 404
     
-    pgp_message = PGPy.PGPMessage.new(message, cleartext=True)
+    pgp_message = PGPy.PGPMessage.from_blob(message)
         
     # Decrypt the message
     private_key, _ = PGPy.PGPKey.from_blob(key.private_key)
     if private_key.is_protected and not private_key.is_unlocked:
-        with private_key.unlock(password):
-            decrypted_message = (private_key.decrypt(pgp_message)).message
+        if not password:
+            return jsonify({'message': 'Private key is protected. Password is required'}), 400
+        
+        try:
+            with private_key.unlock(password):
+                try:
+                    decrypted_message = (private_key.decrypt(pgp_message)).message
+                except Exception:
+                    return jsonify({'message': 'Could not decrypt message'}), 400
+        except PGPy.errors.PGPDecryptionError:
+            return jsonify({'message': 'Could not unlock private key. Is your password correct?'}), 400
     else:
         decrypted_message = (private_key.decrypt(pgp_message)).message
 
@@ -179,9 +197,12 @@ def decrypt_message():
 def sign_message():
     data = request.json
 
+    if not data.get('message') or not data.get('privateKey'):
+        return jsonify({'message': 'Missing required fields'}), 400
+
     message = str(data.get('message'))
     keyId = int(data.get('privateKey'))
-    password = str(data.get('password'))
+    password = str(data.get('password')) if data.get('password') else None
 
     key = Key.query.filter_by(id=keyId).first()
     if not key:
@@ -192,10 +213,16 @@ def sign_message():
     # Sign the message
     private_key, _ = PGPy.PGPKey.from_blob(key.private_key)
     if private_key.is_protected and not private_key.is_unlocked:
+        if not password:
+            return jsonify({'message': 'Private key is protected. Password is required'}), 400
+
         try:
             with private_key.unlock(password):
-                signature = private_key.sign(message, hash=PGPy.constants.HashAlgorithm.SHA512)
-                pgp_message |= signature
+                try:
+                    signature = private_key.sign(message, hash=PGPy.constants.HashAlgorithm.SHA512)
+                    pgp_message |= signature
+                except Exception:
+                    return jsonify({'message': 'Could not sign message'}), 400
         except PGPy.errors.PGPDecryptionError:
             return jsonify({'message': 'Could not unlock private key. Is your password correct?'}), 400
     else:
