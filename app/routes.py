@@ -29,13 +29,13 @@ def generate_keys():
     uid = PGPy.PGPUID.new('', comment=comment, email=email)
 
     key.add_uid(uid, usage={PGPy.constants.KeyFlags.Sign, PGPy.constants.KeyFlags.EncryptCommunications},
-        hashes=[PGPy.constants.HashAlgorithm.SHA256],
+        hashes=[PGPy.constants.HashAlgorithm.SHA512],
         ciphers=[PGPy.constants.SymmetricKeyAlgorithm.AES256],
         compression=[PGPy.constants.CompressionAlgorithm.ZLIB])
     
     # Protect the private key with a passphrase
     if password:
-        key.protect(password, PGPy.constants.SymmetricKeyAlgorithm.AES256, PGPy.constants.HashAlgorithm.SHA256)
+        key.protect(password, PGPy.constants.SymmetricKeyAlgorithm.AES256, PGPy.constants.HashAlgorithm.SHA512)
 
     public_key = str(key.pubkey)
     private_key = str(key)
@@ -145,7 +145,7 @@ def encrypt_message():
     
     public_key = PGPy.PGPKey()
     public_key.parse(key.public_key)
-    pgp_message = public_key.encrypt(PGPy.PGPMessage.new(message))
+    pgp_message = public_key.encrypt(PGPy.PGPMessage.new(message, cleartext=True))
 
     return jsonify({'output': str(pgp_message)})
 
@@ -162,8 +162,7 @@ def decrypt_message():
     if not key:
         return jsonify({'message': 'Private key not found'}), 404
     
-    pgp_message = PGPy.PGPMessage()
-    pgp_message.parse(message)
+    pgp_message = PGPy.PGPMessage.new(message, cleartext=True)
         
     # Decrypt the message
     private_key, _ = PGPy.PGPKey.from_blob(key.private_key)
@@ -187,19 +186,50 @@ def sign_message():
     key = Key.query.filter_by(id=keyId).first()
     if not key:
         return jsonify({'message': 'Private key not found'}), 404
-        
-    # Decrypt the message
-    private_key, _ = PGPy.PGPKey.from_blob(key.private_key)
 
+    pgp_message = PGPy.PGPMessage.new(message, cleartext=True)
+        
+    # Sign the message
+    private_key, _ = PGPy.PGPKey.from_blob(key.private_key)
     if private_key.is_protected and not private_key.is_unlocked:
         try:
             with private_key.unlock(password):
-                signature = str(private_key.sign(PGPy.PGPMessage.new(message), hash=PGPy.constants.HashAlgorithm.SHA512))
+                signature = private_key.sign(message, hash=PGPy.constants.HashAlgorithm.SHA512)
+                pgp_message |= signature
         except PGPy.errors.PGPDecryptionError:
             return jsonify({'message': 'Could not unlock private key. Is your password correct?'}), 400
     else:
-        signature = str(private_key.sign(PGPy.PGPMessage.new(message), hash=PGPy.constants.HashAlgorithm.SHA512))
+        signature = private_key.sign(message, hash=PGPy.constants.HashAlgorithm.SHA512)
+        pgp_message |= signature
 
-    signed_message = f"-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA512\n\n{message}\n{signature}"
+    return jsonify({'output': str(pgp_message)})
 
-    return jsonify({'output': signed_message})
+
+@app.route('/api/verify-message', methods=['POST'])
+def verify_message():
+    data = request.json
+
+    message = str(data.get('message'))
+    keyId = int(data.get('publicKey'))
+
+    key = Key.query.filter_by(id=keyId).first()
+    if not key:
+        return jsonify({'message': 'Public key not found'}), 404
+    
+    try:
+        pgp_message = PGPy.PGPMessage.from_blob(message)
+        if not pgp_message.is_signed:
+            return jsonify({'message': 'Message is not signed'}), 400
+    except ValueError:
+        return jsonify({'message': 'Invalid message'}), 400
+
+    # Verify the message
+    public_key, _ = PGPy.PGPKey.from_blob(key.public_key)
+
+    try:
+        if public_key.verify(pgp_message):
+            return jsonify({'message': 'Signature is valid'})
+        else:
+            return jsonify({'message': 'Signature is invalid'}), 400
+    except PGPy.errors.PGPError:
+        return jsonify({'message': 'Signature is invalid'}), 400

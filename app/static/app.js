@@ -98,8 +98,8 @@ function refreshKeySelectors() {
             const option = document.createElement('option');
             option.value = key.id;
 
-            if(type === 'private' && key.privateKey === "") return;
-            if(type === 'public' && key.publicKey === "") return;
+            if(type === 'private' && key.privateKey === null) return;
+            if(type === 'public' && key.publicKey === null) return;
 
             // Construct the display text
             const email = key.email || '';
@@ -215,12 +215,30 @@ function signMessage() {
     })
     .then(response => response.json())
     .then(data => {
-        const signedMessageField = document.getElementById('signeddMessage');
+        const signedMessageField = document.getElementById('signedMessage');
         if(data.output) {
             signedMessageField.value = data.output;
         } else if(data.message) {
             alert(data.message);
         }
+    });
+}
+
+// Function to verify a signed message
+function verifyMessage() {
+    const message = document.getElementById('messageToVerify').value;
+    const publicKey = document.getElementById('verifyPublicKeySelect').value;
+
+    fetch('/api/verify-message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message, publicKey })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
     });
 }
 
@@ -240,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('encryptMessageButton').addEventListener('click', encryptMessage);
     document.getElementById('decryptMessageButton').addEventListener('click', decryptMessage);
     document.getElementById('signMessageButton').addEventListener('click', signMessage);
+    document.getElementById('verifyMessageButton').addEventListener('click', verifyMessage);
     
     document.querySelectorAll('textarea[readonly]').forEach(textarea => {
         textarea.addEventListener('click', function() {

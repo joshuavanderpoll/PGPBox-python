@@ -126,7 +126,20 @@
                 </div>
             </div>
             <button id="signMessageButton" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Sign Message</button>
-            <textarea id="signeddMessage" readonly class="border p-2 w-full mt-4 dark:bg-gray-700 dark:border-gray-600 resize-none " onclick="selectText(this)" aria-label="Signed Message"></textarea>
+            <textarea id="signedMessage" readonly class="border p-2 w-full mt-4 dark:bg-gray-700 dark:border-gray-600 resize-none " onclick="selectText(this)" aria-label="Signed Message"></textarea>
+        </div>
+
+        <!-- Verify Message Section -->
+        <div class="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-2xl font-bold mb-4">Verify Message</h2>
+            <textarea id="messageToVerify" placeholder="Message" class="border p-2 w-full mb-4 dark:bg-gray-700 dark:border-gray-600 resize-none" aria-label="Message to Sign"></textarea>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="verifyPublicKeySelect" class="block mb-2">Select Public Key</label>
+                    <select id="verifyPublicKeySelect" data-type="public" class="keySelector border p-2 w-full dark:bg-gray-700 dark:border-gray-600"></select>
+                </div>
+            </div>
+            <button id="verifyMessageButton" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Verify Message</button>
         </div>
 
         <!-- Footer -->
