@@ -200,6 +200,30 @@ function decryptMessage() {
     });
 }
 
+// Function to encrypt a message
+function signMessage() {
+    const message = document.getElementById('messageToSign').value;
+    const privateKey = document.getElementById('signPrivateKeySelect').value;
+    const password = document.getElementById('signPrivateKeyPassword').value;
+
+    fetch('/api/sign-message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message, privateKey, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const signedMessageField = document.getElementById('signeddMessage');
+        if(data.output) {
+            signedMessageField.value = data.output;
+        } else if(data.message) {
+            alert(data.message);
+        }
+    });
+}
+
 // Function to select text in a textarea
 function selectText(element) {
     element.select();
@@ -215,6 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('reloadKeysButton').addEventListener('click', refreshKeyList);
     document.getElementById('encryptMessageButton').addEventListener('click', encryptMessage);
     document.getElementById('decryptMessageButton').addEventListener('click', decryptMessage);
+    document.getElementById('signMessageButton').addEventListener('click', signMessage);
     
     document.querySelectorAll('textarea[readonly]').forEach(textarea => {
         textarea.addEventListener('click', function() {

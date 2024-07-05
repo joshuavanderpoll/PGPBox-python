@@ -174,3 +174,32 @@ def decrypt_message():
         decrypted_message = (private_key.decrypt(pgp_message)).message
 
     return jsonify({'output': decrypted_message})
+
+
+@app.route('/api/sign-message', methods=['POST'])
+def sign_message():
+    data = request.json
+
+    message = str(data.get('message'))
+    keyId = int(data.get('privateKey'))
+    password = str(data.get('password'))
+
+    key = Key.query.filter_by(id=keyId).first()
+    if not key:
+        return jsonify({'message': 'Private key not found'}), 404
+        
+    # Decrypt the message
+    private_key, _ = PGPy.PGPKey.from_blob(key.private_key)
+
+    if private_key.is_protected and not private_key.is_unlocked:
+        try:
+            with private_key.unlock(password):
+                signature = str(private_key.sign(PGPy.PGPMessage.new(message), hash=PGPy.constants.HashAlgorithm.SHA512))
+        except PGPy.errors.PGPDecryptionError:
+            return jsonify({'message': 'Could not unlock private key. Is your password correct?'}), 400
+    else:
+        signature = str(private_key.sign(PGPy.PGPMessage.new(message), hash=PGPy.constants.HashAlgorithm.SHA512))
+
+    signed_message = f"-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA512\n\n{message}\n{signature}"
+
+    return jsonify({'output': signed_message})

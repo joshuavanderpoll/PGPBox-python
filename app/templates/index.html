@@ -78,9 +78,9 @@
             </div>
         </div>        
 
-        <!-- Encrypt Messages Section -->
+        <!-- Encrypt Message Section -->
         <div class="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow mb-6">
-            <h2 class="text-2xl font-bold mb-4">Encrypt Messages</h2>
+            <h2 class="text-2xl font-bold mb-4">Encrypt Message</h2>
             <textarea id="messageToEncrypt" placeholder="Message" class="border p-2 w-full mb-4 dark:bg-gray-700 dark:border-gray-600 resize-none" aria-label="Message to Encrypt"></textarea>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -93,9 +93,9 @@
             <textarea id="encryptedMessage" readonly class="border p-2 w-full mt-4 dark:bg-gray-700 dark:border-gray-600 resize-none " onclick="selectText(this)" aria-label="Encrypted Message"></textarea>
         </div>
 
-        <!-- Decrypt Messages Section -->
+        <!-- Decrypt Message Section -->
         <div class="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow mb-6">
-            <h2 class="text-2xl font-bold mb-4">Decrypt Messages</h2>
+            <h2 class="text-2xl font-bold mb-4">Decrypt Message</h2>
             <textarea id="messageToDecrypt" placeholder="Encrypted Message" class="border p-2 w-full mb-4 dark:bg-gray-700 dark:border-gray-600 resize-none" aria-label="Message to Decrypt"></textarea>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -111,9 +111,27 @@
             <textarea id="decryptedMessage" readonly class="border p-2 w-full mt-4 dark:bg-gray-700 dark:border-gray-600 resize-none " onclick="selectText(this)" aria-label="Decrypted Message"></textarea>
         </div>
 
+        <!-- Sign Message Section -->
+        <div class="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-2xl font-bold mb-4">Sign Message</h2>
+            <textarea id="messageToSign" placeholder="Message" class="border p-2 w-full mb-4 dark:bg-gray-700 dark:border-gray-600 resize-none" aria-label="Message to Sign"></textarea>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="signPrivateKeySelect" class="block mb-2">Select Private Key</label>
+                    <select id="signPrivateKeySelect" data-type="private" class="keySelector border p-2 w-full dark:bg-gray-700 dark:border-gray-600"></select>
+                </div>
+                <div>
+                    <label for="signPrivateKeyPassword" class="block mb-2">Private Key Password</label>
+                    <input type="password" id="signPrivateKeyPassword" placeholder="Private Key Password" class="border p-2 w-full dark:bg-gray-700 dark:border-gray-600">
+                </div>
+            </div>
+            <button id="signMessageButton" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Sign Message</button>
+            <textarea id="signeddMessage" readonly class="border p-2 w-full mt-4 dark:bg-gray-700 dark:border-gray-600 resize-none " onclick="selectText(this)" aria-label="Signed Message"></textarea>
+        </div>
+
         <!-- Footer -->
         <footer class="text-center mt-6">
-            <p class="text-gray-600 dark:text-gray-400">Star this project on <a href="https://github.com/your-repo" class="text-blue-500">GitHub</a></p>
+            <p class="text-gray-600 dark:text-gray-400">Star this project on <a target="_blank" href="https://github.com/joshuavanderpoll/PGPBox-python" class="text-blue-500">GitHub</a></p>
         </footer>
     </div>
 </body>
