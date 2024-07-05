@@ -1,0 +1,5 @@
+.DS_Store
+.venv
+instance/
+__pycache__/
+.vscode/
