@@ -1,17 +1,5 @@
 let keys
 
-// Detect the device's dark/light mode and apply it
-window.addEventListener('load', () => {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-    }
-});
-
-// Function to toggle dark mode manually
-function toggleDarkMode() {
-    document.documentElement.classList.toggle('dark');
-}
-
 // Function to generate keys
 function generateKeys() {
     const keyType = document.getElementById('keyType').value;
@@ -66,7 +54,7 @@ function refreshKeyList() {
         keys = data.keys;
 
         keys.forEach(key => {
-            const copyPrivateKey = key.privateKey ? `<button class="copyPrivateKeyButton bg-orange-600 text-white px-2 py-1 rounded" data-key="${key.privateKey}">Copy Private</button>` : '';
+            const copyPrivateKey = key.privateKey ? `<button class="copyPrivateKeyButton bg-red-500 text-white px-2 py-1 rounded" data-key="${key.privateKey}">Copy Private</button>` : '';
 
             const row = `<tr>
                 <td class="border px-4 py-2">${formatFingerprint(key.fingerprint)}</td>
@@ -251,7 +239,6 @@ function selectText(element) {
 document.addEventListener('DOMContentLoaded', () => {
     refreshKeyList()
     
-    document.getElementById('darkModeSwitch').addEventListener('click', toggleDarkMode);
     document.getElementById('generateKeysButton').addEventListener('click', generateKeys);
     document.getElementById('storeKeysButton').addEventListener('click', storeKeys);
     document.getElementById('reloadKeysButton').addEventListener('click', refreshKeyList);

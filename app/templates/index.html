@@ -1,31 +1,25 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PGPBox</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
-    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='tailwind.min.css') }}">
     <script defer src="{{ url_for('static', filename='app.js') }}"></script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 dark:text-white transition-colors duration-300 p-6">
+<body class="bg-gray-900 text-white transition-colors duration-300 p-6">
     <div class="container mx-auto">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold">PGPBox Toolbox</h1>
-            <button id="darkModeSwitch" class="bg-gray-800 text-white px-4 py-2 rounded">Dark Mode</button>
         </div>
         
         <!-- Generate Keys Section -->
-        <div class="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow mb-6">
+        <div class="bg-gray-800 text-white p-6 rounded-lg shadow mb-6">
             <h2 class="text-2xl font-bold mb-4">Generate Keys</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="keyType" class="block mb-2">Key Type</label>
-                    <select id="keyType" class="border p-2 w-full dark:bg-gray-700 dark:border-gray-600">
+                    <select id="keyType" class="border p-2 w-full bg-gray-700 border-gray-600">
                         <option value="RSA-1024">RSA-1024</option>
                         <option value="RSA-2048">RSA-2048</option>
                         <option value="RSA-4096" selected>RSA-4096</option>
@@ -36,27 +30,27 @@
                 </div>
                 <div>
                     <label for="keyPassword" class="block mb-2">Password (Optional)</label>
-                    <input type="password" id="keyPassword" placeholder="Password" class="border p-2 w-full dark:bg-gray-700 dark:border-gray-600">
+                    <input type="password" id="keyPassword" placeholder="Password" class="border p-2 w-full bg-gray-700 border-gray-600">
                 </div>
                 <div>
                     <label for="keyComment" class="block mb-2">Comment (Optional)</label>
-                    <input type="text" id="keyComment" placeholder="Comment (Optional)" class="border p-2 w-full dark:bg-gray-700 dark:border-gray-600">
+                    <input type="text" id="keyComment" placeholder="Comment (Optional)" class="border p-2 w-full bg-gray-700 border-gray-600">
                 </div>
                 <div>
                     <label for="keyEmail" class="block mb-2">Email (Optional)</label>
-                    <input type="email" id="keyEmail" placeholder="Email (Optional)" class="border p-2 w-full dark:bg-gray-700 dark:border-gray-600">
+                    <input type="email" id="keyEmail" placeholder="Email (Optional)" class="border p-2 w-full bg-gray-700 border-gray-600">
                 </div>
             </div>
             <button id="generateKeysButton" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Generate Keys</button>
         </div>
 
         <!-- View Keys Section -->
-        <div class="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow mb-6">
+        <div class="bg-gray-800 text-white p-6 rounded-lg shadow mb-6">
             <h2 class="text-2xl font-bold mb-4">Keys</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="md:col-span-3 overflow-x-auto">
-                    <table class="min-w-full bg-white dark:bg-gray-800 dark:text-white border">
+                    <table class="min-w-full bg-gray-800 text-white border">
                         <thead>
                             <tr>
                                 <th class="px-4 py-2 border">Fingerprint</th>
@@ -71,7 +65,7 @@
                 </div>
                 <div>
                     <label for="key" class="block mb-2">Key (public/private)</label>
-                    <textarea id="key" placeholder="Key" class="border p-2 w-full mb-4 dark:bg-gray-700 dark:border-gray-600 resize-none" aria-label="Key"></textarea>
+                    <textarea id="key" placeholder="Key" class="border p-2 w-full mb-4 bg-gray-700 border-gray-600 resize-none" aria-label="Key"></textarea>
                     <button id="storeKeysButton" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 w-full">Add Key</button>
                     <button id="reloadKeysButton" class="bg-gray-500 text-white px-4 py-2 rounded w-full">Refresh Keys</button>
                 </div>
@@ -79,64 +73,64 @@
         </div>        
 
         <!-- Encrypt Message Section -->
-        <div class="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow mb-6">
+        <div class="bg-gray-800 text-white p-6 rounded-lg shadow mb-6">
             <h2 class="text-2xl font-bold mb-4">Encrypt Message</h2>
-            <textarea id="messageToEncrypt" placeholder="Message" class="border p-2 w-full mb-4 dark:bg-gray-700 dark:border-gray-600 resize-none" aria-label="Message to Encrypt"></textarea>
+            <textarea id="messageToEncrypt" placeholder="Message" class="border p-2 w-full mb-4 bg-gray-700 border-gray-600 resize-none" aria-label="Message to Encrypt"></textarea>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="keySelectEncrypt" class="block mb-2">Recipient Key</label>
-                    <select id="keySelectEncrypt" data-type="public" class="keySelector border p-2 w-full dark:bg-gray-700 dark:border-gray-600"></select>
+                    <select id="keySelectEncrypt" data-type="public" class="keySelector border p-2 w-full bg-gray-700 border-gray-600"></select>
                 </div>
             </div>
 
             <button id="encryptMessageButton" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Encrypt Message</button>
-            <textarea id="encryptedMessage" readonly class="border p-2 w-full mt-4 dark:bg-gray-700 dark:border-gray-600 resize-none " onclick="selectText(this)" aria-label="Encrypted Message"></textarea>
+            <textarea id="encryptedMessage" readonly class="border p-2 w-full mt-4 bg-gray-700 border-gray-600 resize-none " onclick="selectText(this)" aria-label="Encrypted Message"></textarea>
         </div>
 
         <!-- Decrypt Message Section -->
-        <div class="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow mb-6">
+        <div class="bg-gray-800 text-white p-6 rounded-lg shadow mb-6">
             <h2 class="text-2xl font-bold mb-4">Decrypt Message</h2>
-            <textarea id="messageToDecrypt" placeholder="Encrypted Message" class="border p-2 w-full mb-4 dark:bg-gray-700 dark:border-gray-600 resize-none" aria-label="Message to Decrypt"></textarea>
+            <textarea id="messageToDecrypt" placeholder="Encrypted Message" class="border p-2 w-full mb-4 bg-gray-700 border-gray-600 resize-none" aria-label="Message to Decrypt"></textarea>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="privateKeySelect" class="block mb-2">Select Private Key</label>
-                    <select id="privateKeySelect" data-type="private" class="keySelector border p-2 w-full dark:bg-gray-700 dark:border-gray-600"></select>
+                    <select id="privateKeySelect" data-type="private" class="keySelector border p-2 w-full bg-gray-700 border-gray-600"></select>
                 </div>
                 <div>
                     <label for="privateKeyPassword" class="block mb-2">Private Key Password</label>
-                    <input type="password" id="privateKeyPassword" placeholder="Private Key Password" class="border p-2 w-full dark:bg-gray-700 dark:border-gray-600">
+                    <input type="password" id="privateKeyPassword" placeholder="Private Key Password" class="border p-2 w-full bg-gray-700 border-gray-600">
                 </div>
             </div>
             <button id="decryptMessageButton" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Decrypt Message</button>
-            <textarea id="decryptedMessage" readonly class="border p-2 w-full mt-4 dark:bg-gray-700 dark:border-gray-600 resize-none " onclick="selectText(this)" aria-label="Decrypted Message"></textarea>
+            <textarea id="decryptedMessage" readonly class="border p-2 w-full mt-4 bg-gray-700 border-gray-600 resize-none " onclick="selectText(this)" aria-label="Decrypted Message"></textarea>
         </div>
 
         <!-- Sign Message Section -->
-        <div class="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow mb-6">
+        <div class="bg-gray-800 text-white p-6 rounded-lg shadow mb-6">
             <h2 class="text-2xl font-bold mb-4">Sign Message</h2>
-            <textarea id="messageToSign" placeholder="Message" class="border p-2 w-full mb-4 dark:bg-gray-700 dark:border-gray-600 resize-none" aria-label="Message to Sign"></textarea>
+            <textarea id="messageToSign" placeholder="Message" class="border p-2 w-full mb-4 bg-gray-700 border-gray-600 resize-none" aria-label="Message to Sign"></textarea>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="signPrivateKeySelect" class="block mb-2">Select Private Key</label>
-                    <select id="signPrivateKeySelect" data-type="private" class="keySelector border p-2 w-full dark:bg-gray-700 dark:border-gray-600"></select>
+                    <select id="signPrivateKeySelect" data-type="private" class="keySelector border p-2 w-full bg-gray-700 border-gray-600"></select>
                 </div>
                 <div>
                     <label for="signPrivateKeyPassword" class="block mb-2">Private Key Password</label>
-                    <input type="password" id="signPrivateKeyPassword" placeholder="Private Key Password" class="border p-2 w-full dark:bg-gray-700 dark:border-gray-600">
+                    <input type="password" id="signPrivateKeyPassword" placeholder="Private Key Password" class="border p-2 w-full bg-gray-700 border-gray-600">
                 </div>
             </div>
             <button id="signMessageButton" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Sign Message</button>
-            <textarea id="signedMessage" readonly class="border p-2 w-full mt-4 dark:bg-gray-700 dark:border-gray-600 resize-none " onclick="selectText(this)" aria-label="Signed Message"></textarea>
+            <textarea id="signedMessage" readonly class="border p-2 w-full mt-4 bg-gray-700 border-gray-600 resize-none " onclick="selectText(this)" aria-label="Signed Message"></textarea>
         </div>
 
         <!-- Verify Message Section -->
-        <div class="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow mb-6">
+        <div class="bg-gray-800 text-white p-6 rounded-lg shadow mb-6">
             <h2 class="text-2xl font-bold mb-4">Verify Message</h2>
-            <textarea id="messageToVerify" placeholder="Message" class="border p-2 w-full mb-4 dark:bg-gray-700 dark:border-gray-600 resize-none" aria-label="Message to Sign"></textarea>
+            <textarea id="messageToVerify" placeholder="Message" class="border p-2 w-full mb-4 bg-gray-700 border-gray-600 resize-none" aria-label="Message to Sign"></textarea>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label for="verifyPublicKeySelect" class="block mb-2">Select Public Key</label>
-                    <select id="verifyPublicKeySelect" data-type="public" class="keySelector border p-2 w-full dark:bg-gray-700 dark:border-gray-600"></select>
+                    <select id="verifyPublicKeySelect" data-type="public" class="keySelector border p-2 w-full bg-gray-700 border-gray-600"></select>
                 </div>
             </div>
             <button id="verifyMessageButton" class="bg-blue-500 text-white px-4 py-2 rounded mt-4">Verify Message</button>
@@ -144,7 +138,7 @@
 
         <!-- Footer -->
         <footer class="text-center mt-6">
-            <p class="text-gray-600 dark:text-gray-400">Star this project on <a target="_blank" href="https://github.com/joshuavanderpoll/PGPBox-python" class="text-blue-500">GitHub</a></p>
+            <p class="text-gray-400">Star this project on <a target="_blank" href="https://github.com/joshuavanderpoll/PGPBox-python" class="text-blue-500">GitHub</a></p>
         </footer>
     </div>
 </body>
