@@ -190,6 +190,9 @@ def decrypt_message():
     else:
         decrypted_message = (private_key.decrypt(pgp_message)).message
 
+    if isinstance(decrypted_message, bytearray):
+        decrypted_message = decrypted_message.decode('utf-8')
+
     return jsonify({'output': decrypted_message})
 
 
