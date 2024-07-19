@@ -2,7 +2,6 @@ from flask import current_app as app, jsonify, request, render_template
 from . import db
 from .models import Key
 import pgpy as PGPy
-import re
 
 
 @app.route('/')
@@ -246,8 +245,11 @@ def verify_message():
     if not key:
         return jsonify({'message': 'Public key not found'}), 404
     
+    stripped_message_lines = [line.strip() for line in message.splitlines()]
+    stripped_message = '\n'.join(stripped_message_lines)
+
     try:
-        pgp_message = PGPy.PGPMessage.from_blob(message)
+        pgp_message = PGPy.PGPMessage.from_blob(stripped_message)
         if not pgp_message.is_signed:
             return jsonify({'message': 'Message is not signed'}), 400
     except ValueError:
